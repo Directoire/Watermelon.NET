@@ -29,8 +29,6 @@ namespace Watermelon.NET.Services
 
         private async Task OnMessageCreated(DiscordClient sender, MessageCreateEventArgs e)
         {
-            Log.Information(e.Message.Content);
-            
             if (e.Message.MessageType != MessageType.Default) return;
             if (e.Message.Author.IsBot) return;
             

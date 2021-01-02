@@ -6,12 +6,35 @@ namespace Watermelon.NET.Configurations
 {
     public class Configuration
     {
-        public string Prefix { get; private set; }
-        public string Token { get; private set; }
-        
-        public DatabaseConfiguration? DatabaseConfiguration { get; private set; }
-        
+        private string _prefix;
+        private string _token;
         private readonly string _configurationPath = Path.Combine(Environment.CurrentDirectory, "appsettings.json");
+        
+        public string Prefix
+        {
+            get => _prefix;
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                    throw new NullReferenceException($"Prefix must be defined in {_configurationPath}");
+
+                _prefix = value;
+            }
+        }
+        
+        public string Token
+        {
+            get => _token;
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                    throw new NullReferenceException($"Token must be defined in {_configurationPath}");
+
+                _token = value;
+            }
+        }
+        
+        public DatabaseConfiguration DatabaseConfiguration { get; private set; }
 
         public Configuration()
             => LoadConfiguration();
