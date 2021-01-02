@@ -63,8 +63,10 @@ Watermelon is a Discord bot that was initially made using Discord.NET. However, 
 * [Qmmands 3.1.2](https://github.com/Quahu/Qmmands)
 * [Serilog 2.10.1](https://serilog.net/)
 * [Microsoft.Extensions.Configuration 5.0.0](https://github.com/dotnet/runtime)
-* [Microsoft.Extensions.DependencyInjection 5.0.0](https://github.com/dotnet/runtime)
+* [Microsoft.Extensions.DependencyInjection 5.0.1](https://github.com/dotnet/runtime)
 * [Microsoft.Extensions.Logging 5.0.0](https://github.com/dotnet/runtime)
+* [Microsoft.EntityFrameworkCore 5.0.1](https://docs.microsoft.com/en-us/ef/)
+* [Npgsql.EntityFrameworkCore.PostgreSQL 5.0.1](https://www.npgsql.org/efcore/)
 
 
 <!-- GETTING STARTED -->
@@ -81,8 +83,15 @@ git clone https://github.com/Directoire/Watermelon.NET.git
 2. Adjust the appsettings.json
 ```
 {
-    "Token": "fill in the token of your bot",
-    "Prefix": "fill in the prefix that you like"
+    "Token": "yourtoken",
+    "Prefix": "!",
+    "DatabaseConfiguration": {
+        "Host": "host",
+        "Port": "5432",
+        "Database": "database",
+        "Username": "username",
+        "Password": "password"
+    }
 }
 ```
 3. Run the bot by pressing F5 or run it manually 
