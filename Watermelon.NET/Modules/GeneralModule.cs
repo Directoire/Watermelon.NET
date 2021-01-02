@@ -7,9 +7,9 @@ using Watermelon.NET.Commons.Embeds;
 namespace Watermelon.NET.Modules
 {
     [Name("General")]
-    public class General : WatermelonModule
+    public class GeneralModule : WatermelonModule
     {
-        public General(IServiceProvider serviceProvider) : base(serviceProvider)
+        public GeneralModule(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
         

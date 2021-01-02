@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using Serilog;
 using Watermelon.NET.Attributes;
+using Watermelon.NET.Data.Context;
 using Watermelon.NET.Implementation;
 
 namespace Watermelon.NET.Services
@@ -44,7 +45,7 @@ namespace Watermelon.NET.Services
                     return;
             }
 
-            var prefix = Configuration.Prefix;
+            var prefix = await GetGuildPrefixAsync(args.Guild);
             if (!CommandUtilities.HasPrefix(args.Message.Content, prefix, StringComparison.InvariantCultureIgnoreCase, out var output))
             {
                 if (client.CurrentUser == null)
@@ -65,6 +66,18 @@ namespace Watermelon.NET.Services
             
             // TODO: Implement error handling
             await context.Channel.SendMessageAsync(result.ToString());
+        }
+        
+        private async Task<string> GetGuildPrefixAsync(DiscordGuild? guild)
+        {
+            if (guild is null)
+                return Configuration.Prefix;
+
+            using var scope = Watermelon.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<WatermelonContext>();
+            var prefix = (await db.Guilds.FindAsync(guild.Id))?.Prefix;
+            
+            return !string.IsNullOrEmpty(prefix) ? prefix : Configuration.Prefix;
         }
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using Serilog;
 using Watermelon.NET.Configurations;
+using Watermelon.NET.Data.Context;
 using Watermelon.NET.Implementation;
 
 namespace Watermelon.NET.Modules
@@ -12,7 +13,9 @@ namespace Watermelon.NET.Modules
     public abstract class WatermelonModule : ModuleBase<WatermelonCommandContext>, IAsyncDisposable
     {
         protected readonly Watermelon Watermelon;
+        
         public readonly Configuration Configuration;
+        public readonly WatermelonContext DbContext;
 
         private readonly IServiceScope _scope;
 
@@ -20,6 +23,9 @@ namespace Watermelon.NET.Modules
         {
             Watermelon = serviceProvider.GetRequiredService<Watermelon>();
             Configuration = serviceProvider.GetRequiredService<Configuration>();
+
+            _scope = serviceProvider.CreateScope();
+            DbContext = _scope.ServiceProvider.GetRequiredService<WatermelonContext>();
         }
         
         public async ValueTask DisposeAsync()

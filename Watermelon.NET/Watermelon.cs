@@ -1,11 +1,14 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -13,6 +16,7 @@ using Qmmands;
 using Serilog;
 using Watermelon.NET.Attributes;
 using Watermelon.NET.Configurations;
+using Watermelon.NET.Data.Context;
 using Watermelon.NET.Services;
 
 namespace Watermelon.NET
@@ -33,7 +37,7 @@ namespace Watermelon.NET
             #if DEBUG
             Log.Information($"Initializing development Watermelon version {Version}");
             #else
-            Log.Information($"Initializing Watermelon version {Version}");
+            Log.Information($"Initializing production Watermelon version {Version}");
             #endif
             
             _configuration = new Configuration();
@@ -54,6 +58,8 @@ namespace Watermelon.NET
                 StringComparison = StringComparison.InvariantCultureIgnoreCase
             });
 
+            var databaseConnection = GetDatabaseConnection();
+
             var watermelonServices = typeof(Watermelon).Assembly.GetTypes()
                 .Where(x => typeof(WatermelonService).IsAssignableFrom(x)
                             && !x.GetTypeInfo().IsInterface
@@ -67,6 +73,8 @@ namespace Watermelon.NET
                 .AddSingleton(this)
                 .AddSingleton(_configuration)
                 .AddSingleton(commandService)
+                .AddDbContext<WatermelonContext>(x => 
+                    x.UseNpgsql(databaseConnection))
                 .BuildServiceProvider();
 
             var autoStartServices = typeof(Watermelon).Assembly.GetTypes()
@@ -84,18 +92,27 @@ namespace Watermelon.NET
         public Task ConnectAsync()
             => Client.ConnectAsync();
 
-        private async Task OnMessageCreated(DiscordClient sender, MessageCreateEventArgs e)
-        {
-            if (e.Message.Content.ToLower().StartsWith("ping"))
-                await e.Message.RespondAsync("Pong!");
-        }
-
         public object? GetService(Type serviceType)
         {
             if (serviceType == typeof(Watermelon) || serviceType == GetType())
                 return this;
 
             return _provider.GetService(serviceType);
+        }
+        
+        private string GetDatabaseConnection()
+        {
+            var connectionString = new StringBuilder();
+            connectionString.Append("Host=").Append(_configuration.DatabaseConfiguration.Host).Append(';');
+
+            if (_configuration.DatabaseConfiguration.Port > 0)
+                connectionString.Append("Port=").Append(_configuration.DatabaseConfiguration.Port).Append(';');
+
+            connectionString.Append("Username=").Append(_configuration.DatabaseConfiguration.Username).Append(';')
+                .Append("Password=").Append(_configuration.DatabaseConfiguration.Password).Append(';')
+                .Append("Database=").Append(_configuration.DatabaseConfiguration.Database).Append(';');
+
+            return connectionString.ToString();
         }
     }
 }
