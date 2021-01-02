@@ -1,5 +1,6 @@
 
 [![Contributors][contributors-shield]][contributors-url]
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Directoire/Watermelon.NET/CodeQL)
 [![Forks][forks-shield]][forks-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
