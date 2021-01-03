@@ -68,6 +68,8 @@ namespace Watermelon.NET.Modules
             }
 
             var responseString = await response.Content.ReadAsStringAsync();
+            
+            
             await ReplyAsync(responseString);
         }
     }
