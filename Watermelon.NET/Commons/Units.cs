@@ -11,23 +11,20 @@ namespace Watermelon.NET.Commons
             Imperial
         }
 
+        private const UnitsType Default = UnitsType.Metric;
+
         public static bool TryParse(string s, out UnitsType unitsType)
         {
             s = s.ToLower();
 
-            if (s != "metric" && s != "imperial" && s != "standard")
+            if (s != "metric" && s != "imperial" && s != "kelvin")
             {
-                unitsType = UnitsType.Standard;
+                unitsType = Default;
                 return false;
             }
 
-            unitsType = s switch
-            {
-                "metric" => UnitsType.Metric,
-                "imperial" => UnitsType.Imperial,
-                "standard" => UnitsType.Standard,
-                _ => UnitsType.Standard
-            };
+            unitsType = Parse(s);
+            
             return true;
         }
 
@@ -35,15 +32,15 @@ namespace Watermelon.NET.Commons
         {
             s = s.ToLower();
 
-            if (s != "metric" && s != "imperial" && s != "standard")
-                return UnitsType.Standard;
+            if (s != "metric" && s != "imperial" && s != "kelvin")
+                return Default;
 
             return s switch
             {
                 "metric" => UnitsType.Metric,
                 "imperial" => UnitsType.Imperial,
-                "standard" => UnitsType.Standard,
-                _ => UnitsType.Standard
+                "kelvin" => UnitsType.Standard,
+                _ => Default
             };
         }
     }

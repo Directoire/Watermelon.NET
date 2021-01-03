@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using DSharpPlus.Entities;
 
 namespace Watermelon.NET.Implementation
@@ -27,5 +28,13 @@ namespace Watermelon.NET.Implementation
             output = string.Empty;
             return false;
         }
+
+        public static string ToFirstUpper(this string input) =>
+            input switch
+            {
+                null => throw new ArgumentNullException(nameof(input)),
+                "" => throw new ArgumentException($"{nameof(input)} cannot be empty", nameof(input)),
+                _ => input.First().ToString().ToUpper() + input.Substring(1)
+            };
     }
 }

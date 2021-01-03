@@ -3,10 +3,13 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using DSharpPlus.Entities;
 using Qmmands;
 using Serilog;
 using Watermelon.NET.Commons;
 using Watermelon.NET.Commons.Embeds;
+using Watermelon.NET.Commons.Weather;
+using Watermelon.NET.Implementation;
 using UnitsType = Watermelon.NET.Commons.Units.UnitsType;
 
 namespace Watermelon.NET.Modules
@@ -68,9 +71,37 @@ namespace Watermelon.NET.Modules
             }
 
             var responseString = await response.Content.ReadAsStringAsync();
-            
-            
-            await ReplyAsync(responseString);
+            var weatherResponse = new WeatherResponse()
+                .ParseJson(responseString);
+
+            var d = units switch
+            {
+                UnitsType.Standard => "K",
+                UnitsType.Imperial => "°F",
+                UnitsType.Metric => "°C",
+            };
+
+            var s = units switch
+            {
+                UnitsType.Imperial => "mph",
+                _ => "m/s"
+            };
+
+            var embed = new DiscordEmbedBuilder()
+                .WithAuthor($"Weather in {weatherResponse.Name}", null, weatherResponse.Weather.Icon)
+                .AddField("Temperatures",
+                    $"Temperature: {weatherResponse.Main.Temp} {d}\n" +
+                    $"Feels like: {weatherResponse.Main.FeelsLike} {d}\n" +
+                    $"Humidity: {weatherResponse.Main.Humidity}%\n")
+                .AddField("Wind",
+                    $"Speed: {weatherResponse.Wind.Speed} {s}\n" +
+                    $"Direction: {weatherResponse.Wind.Deg} °", true)
+                .AddField("Clouds", weatherResponse.Clouds.All + "%", true)
+                .AddField("Description", weatherResponse.Weather.Description.ToFirstUpper(), true)
+                .WithColor(new DiscordColor("#F2F2F1"))
+                .Build();
+
+            await ReplyAsync(embed: embed);
         }
     }
 }
