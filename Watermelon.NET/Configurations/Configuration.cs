@@ -9,6 +9,7 @@ namespace Watermelon.NET.Configurations
         private string _prefix;
         private string _token;
         private DatabaseConfiguration _databaseConfiguration;
+        private string _openWeatherKey;
             
         private readonly string _configurationPath = Path.Combine(Environment.CurrentDirectory, "appsettings.json");
         
@@ -39,7 +40,17 @@ namespace Watermelon.NET.Configurations
         public DatabaseConfiguration DatabaseConfiguration
         {
             get => _databaseConfiguration;
-            set => _databaseConfiguration = value ?? throw new NullReferenceException($"Database must be (properly) defined in {_configurationPath}");
+            set => _databaseConfiguration = value ??
+                                            throw new NullReferenceException(
+                                                $"Database must be (properly) defined in {_configurationPath}");
+        }
+
+        public string OpenWeatherKey
+        {
+            get => _openWeatherKey;
+            set => _openWeatherKey = value ??
+                                     throw new NullReferenceException(
+                                         $"Open Weather Key must be (properly) defined in {_configurationPath}");
         }
 
         public Configuration()
@@ -52,8 +63,9 @@ namespace Watermelon.NET.Configurations
                 .Build();
 
             Prefix = config.GetValue<string>(nameof(Prefix));
-            Token =  config.GetValue<string>(nameof(Token));
-            
+            Token = config.GetValue<string>(nameof(Token));
+            OpenWeatherKey = config.GetValue<string>(nameof(OpenWeatherKey));
+
             var databaseConfiguration = config.GetSection(nameof(DatabaseConfiguration));
             DatabaseConfiguration = !databaseConfiguration.Exists() ? null : new DatabaseConfiguration
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using DSharpPlus.CommandsNext.Attributes;
 using Qmmands;
 using Watermelon.NET.Commons;
 using Watermelon.NET.Commons.Embeds;
@@ -14,7 +15,7 @@ namespace Watermelon.NET.Modules
         {
         }
         
-        [Command("prefix")]
+        [Qmmands.Command("prefix")]
         public async Task PrefixAsync(string prefix = null)
         {
             var guild = await DbContext.Guilds

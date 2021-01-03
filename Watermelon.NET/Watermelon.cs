@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using Microsoft.EntityFrameworkCore;
@@ -13,11 +14,15 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Qmmands;
+using Qmmands.Delegates;
 using Serilog;
 using Watermelon.NET.Attributes;
+using Watermelon.NET.Commons;
 using Watermelon.NET.Configurations;
 using Watermelon.NET.Data.Context;
+using Watermelon.NET.Implementation;
 using Watermelon.NET.Services;
+using CommandContext = Qmmands.CommandContext;
 
 namespace Watermelon.NET
 {
@@ -55,7 +60,8 @@ namespace Watermelon.NET
             var commandService = new CommandService(new CommandServiceConfiguration
             {
                 DefaultRunMode = RunMode.Parallel,
-                StringComparison = StringComparison.InvariantCultureIgnoreCase
+                StringComparison = StringComparison.InvariantCultureIgnoreCase,
+                CooldownBucketKeyGenerator = CooldownBucketKeyGenerator
             });
 
             var databaseConnection = GetDatabaseConnection();
@@ -113,6 +119,20 @@ namespace Watermelon.NET
                 .Append("Database=").Append(_configuration.DatabaseConfiguration.Database).Append(';');
 
             return connectionString.ToString();
+        }
+        
+        private object? CooldownBucketKeyGenerator(object bucketType, CommandContext context)
+        {
+            var watermelonContext = (WatermelonCommandContext) context;
+
+            return (WatermelonBucketType) bucketType switch
+            {
+                WatermelonBucketType.Guild => watermelonContext.Guild!.Id.ToString(),
+                WatermelonBucketType.User => watermelonContext.User.Id.ToString(),
+                WatermelonBucketType.Member => $"{watermelonContext.Guild!.Id}_{watermelonContext.User.Id}",
+                WatermelonBucketType.Channel => watermelonContext.Channel.Id.ToString(),
+                _ => null
+            };
         }
     }
 }
