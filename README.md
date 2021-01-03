@@ -85,6 +85,7 @@ git clone https://github.com/Directoire/Watermelon.NET.git
 {
     "Token": "yourtoken",
     "Prefix": "!",
+    "OpenWeatherKey": "openweatherapikey",
     "DatabaseConfiguration": {
         "Host": "host",
         "Port": "5432",
