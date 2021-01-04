@@ -4,11 +4,14 @@ using System.Net.Http;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using Serilog;
+using Watermelon.NET.Attributes;
 using Watermelon.NET.Commons;
 using Watermelon.NET.Commons.Embeds;
 using Watermelon.NET.Commons.Weather;
+using Watermelon.NET.Configurations;
 using Watermelon.NET.Implementation;
 using UnitsType = Watermelon.NET.Commons.Units.UnitsType;
 
@@ -45,6 +48,9 @@ namespace Watermelon.NET.Modules
         [Command("weather")]
         public async Task WeatherAsync([Remainder] string city)
         {
+            if (string.IsNullOrEmpty(Configuration.OpenWeatherKey))
+                return;
+            
             await Context.Channel.TriggerTypingAsync();
 
             var parts = city.ToLower().Split(" ");

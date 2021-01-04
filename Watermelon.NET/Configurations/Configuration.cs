@@ -1,16 +1,17 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
+using Serilog;
 
 namespace Watermelon.NET.Configurations
 {
     public class Configuration
     {
-        private string _prefix;
-        private string _token;
-        private DatabaseConfiguration _databaseConfiguration;
-        private string _openWeatherKey;
-            
+        private string _prefix = null!;
+        private string _token = null!;
+        private DatabaseConfiguration _databaseConfiguration = null!;
+
         private readonly string _configurationPath = Path.Combine(Environment.CurrentDirectory, "appsettings.json");
         
         public string Prefix
@@ -45,16 +46,15 @@ namespace Watermelon.NET.Configurations
                                                 $"Database must be (properly) defined in {_configurationPath}");
         }
 
-        public string OpenWeatherKey
-        {
-            get => _openWeatherKey;
-            set => _openWeatherKey = value ??
-                                     throw new NullReferenceException(
-                                         $"Open Weather Key must be (properly) defined in {_configurationPath}");
-        }
+        public string? OpenWeatherKey { get; set; }
 
         public Configuration()
-            => LoadConfiguration();
+        {
+            LoadConfiguration();
+            
+            if (OpenWeatherKey == null || string.IsNullOrEmpty(OpenWeatherKey))
+                Log.Warning("There is no value set for the Open Weather API key. Thus, all commands involving this API, will be inaccessible.");
+        }
 
         private void LoadConfiguration()
         {
@@ -67,7 +67,7 @@ namespace Watermelon.NET.Configurations
             OpenWeatherKey = config.GetValue<string>(nameof(OpenWeatherKey));
 
             var databaseConfiguration = config.GetSection(nameof(DatabaseConfiguration));
-            DatabaseConfiguration = !databaseConfiguration.Exists() ? null : new DatabaseConfiguration
+            DatabaseConfiguration = new DatabaseConfiguration
             {
                 Host = databaseConfiguration.GetValue<string>(nameof(DatabaseConfiguration.Host)),
                 Port = databaseConfiguration.GetValue<ushort>(nameof(DatabaseConfiguration.Port)),
