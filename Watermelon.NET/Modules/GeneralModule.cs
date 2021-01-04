@@ -114,5 +114,15 @@ namespace Watermelon.NET.Modules
 
             await ReplyAsync(embed: embed);
         }
+
+        [Command("image")]
+        public async Task ImageAsync(DiscordMember member = null)
+        {
+            member ??= (DiscordMember) Context.User;
+            await Context.Channel.TriggerTypingAsync();
+
+            await using var image = await WatermelonImages.GenerateWelcomeImageAsync(member);
+            await Context.Channel.SendFileAsync($"{member.Id}_image.png", image);
+        }
     }
 }
