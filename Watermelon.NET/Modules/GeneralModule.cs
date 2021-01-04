@@ -55,15 +55,20 @@ namespace Watermelon.NET.Modules
 
             var parts = city.ToLower().Split(" ");
             var units = Units.Parse(parts.Last());
-            city = city.Replace(units.ToString().ToLower(), "");
 
+            var user = await DbContext.Users
+                .FindAsync(Context.User.Id);
+
+            if (!Units.Contains(parts.Last()) && user != null)
+                units = user.Units;
+
+            city = city.Replace(units.ToString().ToLower(), "");
+            
             var client = new HttpClient();
             var cityUrlEncoded = UrlEncoder.Default.Encode(city);
             var response = await client.GetAsync(
                 $"https://api.openweathermap.org/data/2.5/weather?q={cityUrlEncoded}&units={units.ToString()}&appid={Configuration.OpenWeatherKey}");
 
-            Log.Debug(response.StatusCode.ToString());
-            
             if (!response.IsSuccessStatusCode)
             {
                 var error = new WatermelonEmbedBuilder()

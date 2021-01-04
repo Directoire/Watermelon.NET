@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using DSharpPlus.CommandsNext.Attributes;
 using Qmmands;
+using Watermelon.NET.Attributes;
 using Watermelon.NET.Commons;
 using Watermelon.NET.Commons.Embeds;
 using Watermelon.NET.Data.Models;
@@ -15,7 +16,7 @@ namespace Watermelon.NET.Modules
         {
         }
         
-        [Qmmands.Command("prefix")]
+        [Qmmands.Command("prefix"), Context(ContextType.Guild)]
         public async Task PrefixAsync(string prefix = null)
         {
             var guild = await DbContext.Guilds
@@ -59,7 +60,7 @@ namespace Watermelon.NET.Modules
             else
                 DbContext.Add(new Guild {Id = Context.Guild.Id, Prefix = prefix});
 
-            bool changed = await DbContext.SaveChangesAsync() > 0;
+            var changed = await DbContext.SaveChangesAsync() > 0;
             if (!changed)
             {
                 var error = new WatermelonEmbedBuilder()
